@@ -1,5 +1,5 @@
 use std::{
-    io::{Read, Write},
+    io::{Read},
     net::{TcpListener, TcpStream},
 };
 
@@ -9,8 +9,9 @@ mod request;
 mod method;
 mod response;
 
+mod routes;
 use request::parse_raw_request;
-use response::HttpCode;
+use response::{send_response};
 
 pub fn run() -> Result<()> {
     let listener = TcpListener::bind("127.0.0.1:4221").context("binding to address")?;
@@ -20,17 +21,12 @@ pub fn run() -> Result<()> {
 
         let raw_request = read_stream(&mut stream).context("reading stream")?;
         let request = parse_raw_request(raw_request).context("parsing raw request")?;
+        let response = routes::router(request).context("routing request")?;
 
-        println!("Request Method: {:?}, Path: {}", request.method, request.path);
-
-        let response_code = if request.path == "/" { HttpCode::Ok } else { HttpCode::NotFound };
-
-
-        let response = format!("HTTP/1.1 {}\r\n\r\n", response_code);
+        //let response_code = if request.path == "/" { HttpCode::Ok } else { HttpCode::NotFound };
 
 
-        stream.write_all(response.as_bytes()).context("writing all response data")?;
-        stream.flush().context("flushing write")?;
+        send_response(response, &mut stream)?;
     }
 
     Ok(())

@@ -5,6 +5,7 @@ use crate::method::Method;
 use std::io::BufRead;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Request {
     pub method: Method,
     pub path: String,
