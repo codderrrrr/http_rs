@@ -25,6 +25,7 @@ pub fn send_response(response: Response, stream: &mut TcpStream) -> Result<()> {
 pub enum HttpCode {
     Ok,
     NotFound,
+    YourFault,
 }
 
 impl Display for HttpCode {
@@ -32,6 +33,7 @@ impl Display for HttpCode {
         let (number, message) = match self {
             Self::Ok => (200, "Ok"),
             Self::NotFound => (404, "Not Found"),
+            Self::YourFault => (400, "Bad Request")
         };
 
         write!(f, "{number} {message}")
@@ -42,11 +44,18 @@ impl Display for HttpCode {
 pub struct Response {
     pub code: HttpCode,
     pub body: Option<String>,
+    pub content_type: ContentType,
 }
 
 impl Response {
     fn content_type_header(&self) ->String {
-        "Content-Type: text/plain\r\n".to_owned()
+        let raw_header = match self.content_type {
+            ContentType::TextPlain => "text/plain",
+            ContentType::ApplicationOctetStream => "application/octet-stream",
+        };
+
+        format!("Content-Type: {raw_header}\r\n")
+
     }
 
     fn content_length_header(&self) -> Option<String> {
@@ -58,4 +67,10 @@ impl Response {
 
         Some(format!("Content-Length: {length}\r\n"))
     }
+}
+
+#[derive(Debug)]
+pub enum ContentType {
+    TextPlain,
+    ApplicationOctetStream,
 }
