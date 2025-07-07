@@ -1,4 +1,4 @@
-use std::{ fmt::Display, io::Write, net::TcpStream };
+use std::{ fmt::Display, io::Write, net::TcpStream};
 
 use anyhow::Result;
 use anyhow::{ Context, Ok };
