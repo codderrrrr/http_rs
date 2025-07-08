@@ -1,4 +1,4 @@
-use std::{ fmt::Display, io::Write, net::TcpStream};
+use std::{ fmt::Display, io::Write, net::TcpStream };
 
 use anyhow::Result;
 use anyhow::{ Context, Ok };
@@ -10,13 +10,18 @@ pub fn send_response(response: Response, stream: &mut TcpStream, request: &Reque
     write!(stream, "{}\r\n", response.code).context("writing http code")?;
 
     if response.body.is_some() {
-        write!(stream, "{}{}", response.content_type_header(), response.content_length_header().unwrap()).context("writing header")?;
+        write!(
+            stream,
+            "{}{}",
+            response.content_type_header(),
+            response.content_length_header().unwrap()
+        ).context("writing header")?;
     }
 
     let accept_encoding = request.headers.get("accept-encoding");
 
-    if accept_encoding.is_some_and(|encoding |encoding.to_lowercase() == "gzip") {
-        write!(stream, "Content-Encoding: gzip").context("writing body")?;
+    if accept_encoding.is_some_and(|encoding| encoding.to_lowercase() == "gzip") {
+        write!(stream, "Content-Encoding: gzip\r\n").context("writing body")?;
     }
 
     write!(stream, "\r\n").context("writing crlf header")?;
@@ -58,18 +63,17 @@ pub struct Response {
 }
 
 impl Response {
-    fn content_type_header(&self) ->String {
+    fn content_type_header(&self) -> String {
         let raw_header = match self.content_type {
             ContentType::TextPlain => "text/plain",
             ContentType::ApplicationOctetStream => "application/octet-stream",
         };
 
         format!("Content-Type: {raw_header}\r\n")
-
     }
 
     fn content_length_header(&self) -> Option<String> {
-        let Some(body) = self.body.as_ref() else{
+        let Some(body) = self.body.as_ref() else {
             return None;
         };
 
