@@ -3,12 +3,20 @@ use std::{ fmt::Display, io::Write, net::TcpStream};
 use anyhow::Result;
 use anyhow::{ Context, Ok };
 
-pub fn send_response(response: Response, stream: &mut TcpStream) -> Result<()> {
+use crate::request::Request;
+
+pub fn send_response(response: Response, stream: &mut TcpStream, request: &Request) -> Result<()> {
     write!(stream, "HTTP/1.1 ").context("writing protocol")?;
     write!(stream, "{}\r\n", response.code).context("writing http code")?;
 
     if response.body.is_some() {
         write!(stream, "{}{}", response.content_type_header(), response.content_length_header().unwrap()).context("writing header")?;
+    }
+
+    let accept_encoding = request.headers.get("accept-encoding");
+
+    if accept_encoding.is_some_and(|encoding |encoding.to_lowercase() == "gzip") {
+        write!(stream, "Content-Encoding: gzip").context("writing body")?;
     }
 
     write!(stream, "\r\n").context("writing crlf header")?;

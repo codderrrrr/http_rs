@@ -46,8 +46,8 @@ pub fn run(port: Option<u32>, directory: Option<String>) -> Result<()> {
 fn handle_connection(mut stream: TcpStream, directory: Option<String>) -> Result<()> {
     let raw_request = read_stream(&mut stream).context("reading stream")?;
     let request = parse_raw_request(raw_request).context("parsing raw request")?;
-    let response = routes::router(request, directory).context("routing request")?;
-    send_response(response, &mut stream).context("sending response")?;
+    let response = routes::router(&request, directory).context("routing request")?;
+    send_response(response, &mut stream, &request).context("sending response")?;
     Ok(())
 }
 

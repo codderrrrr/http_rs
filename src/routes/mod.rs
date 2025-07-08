@@ -9,7 +9,7 @@ use user_agent::user_agent;
 mod file_handler;
 use file_handler::handle_file;
 
-pub fn router(request: Request, directory: Option<String>) -> Result<Response> {
+pub fn router(request: &Request, directory: Option<String>) -> Result<Response> {
     let mut segments = request.path.trim_matches('/').split('/');
 
     let res = match segments.next() {
