@@ -26,6 +26,7 @@ pub enum HttpCode {
     Ok,
     NotFound,
     YourFault,
+    Created,
 }
 
 impl Display for HttpCode {
@@ -33,7 +34,8 @@ impl Display for HttpCode {
         let (number, message) = match self {
             Self::Ok => (200, "Ok"),
             Self::NotFound => (404, "Not Found"),
-            Self::YourFault => (400, "Bad Request")
+            Self::YourFault => (400, "Bad Request"),
+            Self::Created => (201, "Created"),
         };
 
         write!(f, "{number} {message}")
