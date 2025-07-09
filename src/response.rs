@@ -20,9 +20,11 @@ pub fn send_response(response: Response, stream: &mut TcpStream, request: &Reque
 
     let accept_encoding = request.headers.get("accept-encoding");
 
-    if accept_encoding.is_some_and(|encoding| encoding.to_lowercase() == "gzip") {
+    let gzip_encoding = is_gzip_encoding_requested(accept_encoding);
+
+    if gzip_encoding {
         write!(stream, "Content-Encoding: gzip\r\n").context("writing body")?;
-    }
+    }   
 
     write!(stream, "\r\n").context("writing crlf header")?;
 
@@ -87,4 +89,15 @@ impl Response {
 pub enum ContentType {
     TextPlain,
     ApplicationOctetStream,
+}
+
+fn is_gzip_encoding_requested(requested_encodings: Option<&String>) -> bool {
+    requested_encodings.map(|encoding| {
+        let requested_encodings = encoding
+            .split(',')
+            .map(|encoding: &str| encoding.trim().to_lowercase())
+            .collect::<Vec<String>>();
+
+        requested_encodings.iter().any(|encoding: &String| encoding == "gzip")
+    }).unwrap_or(false)
 }
