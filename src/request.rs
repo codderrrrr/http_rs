@@ -1,9 +1,6 @@
-use anyhow::{Context, Result};
-use bytes::{buf::Reader, Buf};
-use std::{
-    collections::HashMap,
-    io::{BufRead, Read},
-};
+use anyhow::{ Context, Result };
+use bytes::{ buf::Reader, Buf };
+use std::{ collections::HashMap, io::{ BufRead, Read } };
 
 use crate::method::Method;
 
@@ -22,14 +19,13 @@ pub fn parse_raw_request(request: Vec<u8>) -> Result<Request> {
 
     let method = parse_method_from_request(&mut reader).context("parsing method")?;
     let path = parse_path_from_request(&mut reader).context("parsing path")?;
-    let protocol = parse_protocol_from_request(&mut reader)
-        .context("parsing protocol system from request")?;
-    let headers = parse_headers_from_request(&mut reader)
-        .context("parsing headers from request")?;
+    let protocol = parse_protocol_from_request(&mut reader).context(
+        "parsing protocol system from request"
+    )?;
+    let headers = parse_headers_from_request(&mut reader).context("parsing headers from request")?;
 
     let body = if matches!(method, Method::Post) {
-        Some(parse_body_from_request(&mut reader, &headers)
-            .context("parsing body from request")?)
+        Some(parse_body_from_request(&mut reader, &headers).context("parsing body from request")?)
     } else {
         None
     };
@@ -56,10 +52,7 @@ fn parse_path_from_request(request: &mut Reader<&[u8]>) -> Result<String> {
     let mut path_bytes = vec![];
 
     request.read_until(SPACE, &mut path_bytes).context("reading path bytes")?;
-    Ok(String::from_utf8(path_bytes)
-        .context("converting path bytes to string")?
-        .trim()
-        .to_owned())
+    Ok(String::from_utf8(path_bytes).context("converting path bytes to string")?.trim().to_owned())
 }
 
 fn parse_protocol_from_request(request: &mut Reader<&[u8]>) -> Result<String> {
@@ -83,12 +76,8 @@ fn parse_headers_from_request(request: &mut Reader<&[u8]>) -> Result<Headers> {
         }
 
         let mut header_parts = raw_header.splitn(2, ':');
-        let header_name = header_parts
-            .next()
-            .map(|h| h.trim().to_lowercase());
-        let header_value = header_parts
-            .next()
-            .map(|h| h.trim().to_owned());
+        let header_name = header_parts.next().map(|h| h.trim().to_lowercase());
+        let header_value = header_parts.next().map(|h| h.trim().to_owned());
 
         if let (Some(name), Some(value)) = (header_name, header_value) {
             headers.insert(name, value);
@@ -108,9 +97,7 @@ fn parse_body_from_request(request: &mut Reader<&[u8]>, headers: &Headers) -> Re
         .context("parsing content-length header into number")?;
 
     let mut buffer = vec![0; length];
-    request
-        .read_exact(&mut buffer)
-        .context("reading exact body bytes")?;
+    request.read_exact(&mut buffer).context("reading exact body bytes")?;
 
     Ok(String::from_utf8(buffer).context("converting body buffer to string")?)
 }

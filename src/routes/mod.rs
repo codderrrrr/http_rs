@@ -19,17 +19,18 @@ pub fn router(request: &Request, directory: Option<String>) -> Result<Response> 
         Some("files") => {
             match request.method {
                 Method::Get => handle_file(segments.next(), directory).context("handling files")?,
-                Method::Post => save_file(directory, segments.next(), &request).context("saving file")?,
+                Method::Post =>
+                    save_file(directory, segments.next(), &request).context("saving file")?,
             }
         }
-        Some(_) => Response { 
-            code: HttpCode::NotFound, 
-            body: None, 
-            content_type: crate::response::ContentType::TextPlain 
-        },
+        Some(_) =>
+            Response {
+                code: HttpCode::NotFound,
+                body: None,
+                content_type: crate::response::ContentType::TextPlain,
+            },
         None => bail!("Did not get any segments"),
     };
 
     Ok(res)
 }
-
