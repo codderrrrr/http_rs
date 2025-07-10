@@ -14,6 +14,8 @@ pub fn save_file(
             code: HttpCode::YourFault,
             body: None,
             content_type: ContentType::TextPlain,
+            gzip_encoding: false,
+            encoded_body: None,
         });
     };
 
@@ -23,6 +25,8 @@ pub fn save_file(
             code: HttpCode::YourFault,
             body: None,
             content_type: ContentType::TextPlain,
+            gzip_encoding: false,
+            encoded_body: None,
         });
     };
 
@@ -32,6 +36,8 @@ pub fn save_file(
             code: HttpCode::YourFault,
             body: None,
             content_type: ContentType::TextPlain,
+            gzip_encoding: false,
+            encoded_body: None,
         });
     };
 
@@ -46,6 +52,8 @@ pub fn save_file(
         code: HttpCode::Created,
         body: None,
         content_type: ContentType::TextPlain,
+        gzip_encoding: false,
+        encoded_body: None,
     })
 }
 

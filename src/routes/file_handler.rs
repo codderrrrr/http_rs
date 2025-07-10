@@ -8,6 +8,8 @@ pub fn handle_file(file_name: Option<&str>, directory: Option<String>) -> Result
             code: HttpCode::YourFault,
             body: None,
             content_type: ContentType::TextPlain,
+            gzip_encoding: false,
+            encoded_body: None,
         });
     };
 
@@ -16,6 +18,8 @@ pub fn handle_file(file_name: Option<&str>, directory: Option<String>) -> Result
             code: HttpCode::NotFound,
             body: None,
             content_type: ContentType::TextPlain,
+            gzip_encoding: false,
+            encoded_body: None,
         });
     };
 
@@ -29,6 +33,8 @@ pub fn handle_file(file_name: Option<&str>, directory: Option<String>) -> Result
                 code: HttpCode::NotFound,
                 body: None,
                 content_type: ContentType::TextPlain,
+                gzip_encoding: false,
+                encoded_body: None,
             });
         }
         Err(error) => return Err(error).context("opening file"),
@@ -43,5 +49,7 @@ pub fn handle_file(file_name: Option<&str>, directory: Option<String>) -> Result
         code: HttpCode::Ok,
         body: Some(contents),
         content_type: ContentType::ApplicationOctetStream,
+        gzip_encoding: false,
+        encoded_body: None,
     })
 }
